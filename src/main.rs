@@ -1,5 +1,5 @@
 extern crate ndarray;
-use ndarray::{Array, ArrayView1, ArrayBase, Ix2, Ix1, s, Axis};
+use ndarray::{Array, ArrayView1, Ix2, Ix1, s, Axis};
 
 #[derive(Debug)]
 #[derive(PartialEq)]
@@ -77,7 +77,7 @@ impl KMeans {
         &new_middle / &cluster_class
     }
 
-    pub fn train(&mut self, data: &Array<f32, Ix2>){
+    pub fn train(&mut self, data: &Array<f32, Ix2>) {
         if self.cluster == Cluster::Init { 
             self.cluster = self.choice_start_point(data);
             if self.cluster == Cluster::Init {
@@ -92,15 +92,26 @@ impl KMeans {
         }
         
     }
+    pub fn deploy(&mut self, data: &Array<f32, Ix2>) -> Array<usize, Ix1> {
+        let mut ans: Array<usize, Ix1> = Array::zeros(data.shape()[0]);
+        for i in 0..data.shape()[0] {
+            ans[i] = self.get_min_dis_point(&data.slice(s![i, ..]));
+        }
+        ans
+    }
 
 }
 
 fn main() {
 
     let mut model = KMeans::new(2);
-    let mut data = Array::<f32, Ix2>::from_shape_vec((30, 2), vec![1.077, 3.842, 1.653, 0.88, 2.85, 2.019, 3.107, 2.039, 1.191, 1.548, 1.034, 1.642, 2.093, 1.969, 1.853, 1.999, 2.736, 1.23, 1.416, 1.895, 1.664, 1.995, 2.645, 1.523, 1.317, 2.344, 1.696, 1.747, 1.519, 0.801, 7.292, 7.618, 8.206, 8.793, 8.623, 8.069, 7.422, 8.069, 7.929, 8.668, 8.385, 8.544, 7.132, 9.257, 7.178, 6.903, 9.222, 8.686, 7.235, 7.424, 9.025, 9.804, 8.663, 7.163, 8.257, 8.395, 8.079, 7.277, 8.571, 7.188]).unwrap();
+    let data = Array::<f32, Ix2>::from_shape_vec((30, 2), vec![1.077, 3.842, 1.653, 0.88, 2.85, 2.019, 3.107, 2.039, 1.191, 1.548, 1.034, 1.642, 2.093, 1.969, 1.853, 1.999, 2.736, 1.23, 1.416, 1.895, 1.664, 1.995, 2.645, 1.523, 1.317, 2.344, 1.696, 1.747, 1.519, 0.801, 7.292, 7.618, 8.206, 8.793, 8.623, 8.069, 7.422, 8.069, 7.929, 8.668, 8.385, 8.544, 7.132, 9.257, 7.178, 6.903, 9.222, 8.686, 7.235, 7.424, 9.025, 9.804, 8.663, 7.163, 8.257, 8.395, 8.079, 7.277, 8.571, 7.188]).unwrap();
     
     model.train(&data);
 
+    let test_data = Array::<f32, Ix2>::from_shape_vec((10, 2), vec![2.133, 2.218, 1.047, 2.394, 3.8, 2.77, 2.312, 2.323, 1.261, -0.484, 6.175, 6.895, 8.231, 7.682, 8.504, 7.792, 6.739, 6.102, 6.659, 10.024]).unwrap();
+    let predict: Array::<usize, Ix1> = model.deploy(&test_data);
+
+    println!("{:?}", predict);
     
 }
