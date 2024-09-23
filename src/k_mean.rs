@@ -54,7 +54,7 @@ impl KMeans {
             return Cluster::Init;
         }
 
-        let mut cluster_start_index: Vec<usize> = furthest_centers_heuristic(&self.cluster_num, data);
+        let cluster_start_index: Vec<usize> = furthest_centers_heuristic(&self.cluster_num, data);
         let mut cluster_start = Array::zeros((self.cluster_num, data.shape()[1]));
         
         for i in 0..self.cluster_num {
